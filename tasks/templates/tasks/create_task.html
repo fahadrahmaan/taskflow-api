@@ -1,41 +1,115 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Task</title>
-</head>
-<body>
+{% extends "tasks/base.html" %}
 
-<h2>Create Task</h2>
+{% block content %}
+
+<div style="display:flex; justify-content:center; align-items:center; margin-top:80px;">
+
+<div style="
+background:white;
+color:#1f2937;
+padding:40px;
+border-radius:12px;
+width:360px;
+box-shadow:0 12px 30px rgba(0,0,0,0.2);
+">
+
+<h2 style="text-align:center; margin-bottom:25px;">Create Task</h2>
+
+{% if error %}
+<p style="color:red; text-align:center; margin-bottom:15px;">{{ error }}</p>
+{% endif %}
 
 <form method="POST">
-    {% csrf_token %}
 
-    <label>Title:</label><br>
-    <input type="text" name="title"><br><br>
+{% csrf_token %}
 
-    <label>Status:</label><br>
-    <select name="status">
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
-    </select><br><br>
+<label style="font-size:14px;">Title</label>
 
-    <label>Priority:</label><br>
-    <select name="priority">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-    </select><br><br>
+<input
+type="text"
+name="title"
+style="
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #e5e7eb;
+border-radius:6px;
+">
 
-    <label>Deadline:</label><br>
-    <input type="date" name="deadline"><br><br>
+<label style="font-size:14px;">Status</label>
 
-    <button type="submit">Create Task</button>
+<select
+name="status"
+style="
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #e5e7eb;
+border-radius:6px;
+">
+
+<option value="pending">Pending</option>
+<option value="completed">Completed</option>
+
+</select>
+
+<label style="font-size:14px;">Priority</label>
+
+<select
+name="priority"
+style="
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #e5e7eb;
+border-radius:6px;
+">
+
+<option value="low">Low</option>
+<option value="medium">Medium</option>
+<option value="high">High</option>
+
+</select>
+
+<label style="font-size:14px;">Deadline</label>
+
+<input
+type="date"
+name="deadline"
+min="{{ today }}"
+style="
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:20px;
+border:1px solid #e5e7eb;
+border-radius:6px;
+">
+
+<button
+type="submit"
+style="
+width:100%;
+padding:12px;
+background:#22c55e;
+color:white;
+border:none;
+border-radius:8px;
+font-weight:500;
+cursor:pointer;
+">
+
+Create Task
+
+</button>
 
 </form>
 
-<br>
+</div>
 
-<a href="/dashboard/">Back to Dashboard</a>
+</div>
 
-</body>
-</html>
+{% endblock %}

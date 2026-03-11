@@ -1,0 +1,358 @@
+TASKFLOW PROJECT DOCUMENTATION
+Author: Fahad Rahman
+
+---
+
+1. PROJECT OVERVIEW
+
+TaskFlow is a backend-focused task management application built using Django and Django REST Framework.
+
+The system allows users to create, update, retrieve, and delete tasks through secure RESTful APIs. Each task is associated with a specific authenticated user to ensure data isolation.
+
+In addition to the API, the project includes a lightweight Django template interface that demonstrates how users can interact with the backend through a dashboard-based workflow.
+
+The application demonstrates key backend development concepts including authentication, API design, caching, rate limiting, secure data access, validation, and containerized local development.
+
+---
+
+2. TECHNOLOGY STACK
+
+Backend Framework
+Django
+
+API Framework
+Django REST Framework
+
+Authentication
+JWT Authentication using SimpleJWT
+Session Authentication for template-based frontend
+
+Database
+PostgreSQL
+
+Caching & Rate Limiting
+Redis
+
+Containerization
+Docker
+Docker Compose
+
+Deployment Platform
+Render
+
+Other Libraries
+psycopg2-binary
+dj-database-url
+gunicorn
+django-redis
+
+---
+
+3. PROJECT STRUCTURE
+
+taskflow
+│
+├── tasks
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│
+├── taskflow
+│   ├── settings.py
+│   ├── urls.py
+│
+├── templates
+│   └── tasks
+│       ├── base.html
+│       ├── home.html
+│       ├── register.html
+│       ├── login.html
+│       ├── dashboard.html
+│       ├── create_task.html
+│       ├── edit_task.html
+│       ├── task_detail.html
+│       ├── admin_insights.html
+│
+├── requirements.txt
+├── README.md
+├── Documentation.txt
+├── Dockerfile
+├── docker-compose.yml
+├── manage.py
+
+---
+
+4. DATABASE MODEL
+
+The Task model contains the following fields:
+
+title
+status
+priority
+deadline
+user
+notes
+
+Explanation:
+
+title
+Represents the name or description of the task.
+
+status
+Indicates the completion state of the task (pending or completed).
+
+priority
+Defines the importance level of the task (low, medium, high).
+
+deadline
+Stores the due date for the task.
+
+user
+ForeignKey linked to Django's built-in User model to ensure each task belongs to a specific user.
+
+notes
+Stores optional additional notes or details related to a specific task.
+
+---
+
+5. AUTHENTICATION SYSTEM
+
+The project supports both JWT authentication for API access and session-based authentication for the Django template interface.
+
+Session authentication enables users to log in through the web interface and manage tasks using the dashboard.
+
+Authentication protections implemented in the project include:
+
+• Dashboard access restricted using Django's login_required decorator
+• Logged-in users are redirected away from login and registration pages
+• Logout redirects users to the login page
+• Browser caching is disabled on protected pages using never_cache to prevent access through the browser back button
+• Username uniqueness validation during registration
+• Confirm password validation during registration
+
+API authentication endpoints:
+
+POST /api/register/
+Creates a new user account.
+
+POST /api/login/
+Generates JWT access and refresh tokens.
+
+POST /api/token/refresh/
+Refreshes expired access tokens.
+
+---
+
+6. TASK MANAGEMENT API
+
+The main API resource is the Task endpoint.
+
+Base Endpoint:
+
+/api/tasks/
+
+Supported operations:
+
+GET /api/tasks/
+Retrieve tasks belonging to the authenticated user.
+
+POST /api/tasks/
+Create a new task.
+
+PUT /api/tasks/{id}/
+Update an existing task.
+
+DELETE /api/tasks/{id}/
+Delete a task.
+
+Each operation is restricted to tasks owned by the authenticated user.
+
+---
+
+7. FILTERING
+
+Tasks can be filtered using query parameters.
+
+Examples:
+
+/api/tasks/?status=pending
+/api/tasks/?priority=high
+
+Filtering allows users to quickly retrieve specific subsets of tasks.
+
+---
+
+8. PAGINATION
+
+Pagination is implemented through Django REST Framework settings to ensure efficient responses when dealing with large datasets.
+
+This prevents large API responses and improves performance.
+
+---
+
+9. REDIS CACHING
+
+Redis is used to cache frequently requested API responses.
+
+Example:
+
+GET /api/tasks/
+
+When a user requests their task list, the response is cached in Redis for a short duration.
+
+Subsequent requests retrieve the data from Redis instead of querying the PostgreSQL database again.
+
+Cache keys are stored per user to maintain proper data isolation.
+
+---
+
+10. REDIS RATE LIMITING
+
+Redis is also used to implement API rate limiting.
+
+The system tracks the number of requests made by each user within a defined time window.
+
+Example rule:
+
+20 requests per minute per user
+
+If the limit is exceeded, the API returns:
+
+HTTP 429 – Too Many Requests
+
+This protects the API from abuse and excessive traffic.
+
+---
+
+11. USER DATA ISOLATION
+
+Each user can only access and modify their own tasks.
+
+This is enforced in API queries using:
+
+Task.objects.filter(user=self.request.user)
+
+This ensures that users cannot view or modify tasks belonging to other users.
+
+---
+
+12. FRONTEND INTERFACE
+
+The project includes a lightweight Django template-based interface that interacts with the backend.
+
+Implemented pages include:
+
+Home Page
+Register Page
+Login Page
+Dashboard
+Create Task Page
+Edit Task Page
+Task Detail Page
+Admin Insights Page
+
+Users can manage tasks directly through the dashboard interface.
+
+Additional frontend functionality includes:
+
+• Clicking a task opens a task detail page
+• Each task supports additional notes that can be created, edited, and saved
+• Task status can be toggled directly from the dashboard without opening the edit page
+• Newer tasks are displayed first on the dashboard
+• Success messages are shown for registration, task creation, task editing, task deletion, and notes updates
+
+---
+
+13. INPUT VALIDATION
+
+To maintain data quality and prevent invalid data entry, several validation rules are implemented:
+
+• Task title cannot be empty
+• Task title must meet minimum length requirements
+• Task title has a maximum length restriction
+• Task deadlines cannot be set in the past
+• Login credentials must not be empty
+• Registration usernames must be unique
+• Registration passwords must match using confirm password validation
+
+These validations help prevent invalid or inconsistent data from being stored in the database.
+
+---
+
+14. SECURITY PRACTICES
+
+The application implements several security practices:
+
+• Login protection for dashboard views using login_required
+• Cache prevention using never_cache to prevent dashboard access after logout
+• Safe object retrieval using get_object_or_404 with user ownership checks
+• User-specific filtering to prevent unauthorized data access
+• Validation for authentication forms to prevent empty credentials
+• API rate limiting to prevent abuse
+• Admin insights page access restricted to superusers
+• User deletion from admin insights restricted to superusers only
+
+These practices ensure proper access control and application stability.
+
+---
+
+15. ADMIN FEATURES
+
+The project includes a custom admin insights page for superusers.
+
+This page provides platform-level visibility without modifying user-specific task ownership rules.
+
+Implemented admin metrics include:
+
+• Total users
+• Total tasks
+• Completed tasks
+• Pending tasks
+• High-priority tasks
+• Overdue pending tasks
+
+Additional admin functionality:
+
+• Superusers can delete users from the custom admin insights page
+
+This provides a simple platform-level management view while preserving task ownership and user isolation rules.
+
+---
+
+16. DEPLOYMENT
+
+The backend application is deployed on Render.
+
+Live API endpoint:
+
+https://taskflow-api-yg28.onrender.com/api/tasks/
+
+Deployment configuration includes:
+
+• Gunicorn production server
+• PostgreSQL database
+• Environment configuration using dj-database-url
+
+The project also supports containerized local development using Docker and Docker Compose.
+
+Docker setup includes:
+
+• Dockerfile for application containerization
+• docker-compose.yml for application and PostgreSQL service orchestration
+• Local containerized migrations and superuser creation
+
+---
+
+17. FUTURE IMPROVEMENTS
+
+Potential improvements for the project include:
+
+• Task search functionality
+• Email notifications for approaching deadlines
+• Role-based access control
+• Real-time task updates using WebSockets
+
+---
+
+END OF DOCUMENTATION

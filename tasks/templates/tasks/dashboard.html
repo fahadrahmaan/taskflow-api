@@ -1,46 +1,145 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
-<body>
+{% extends "tasks/base.html" %}
+
+{% block content %}
+
+<div class="main">
+
+<div class="topbar">
 
 <h1>Your Tasks</h1>
 
-<a href="/logout/">Logout</a>
-<br><br>
+<div>
+<a class="button create-btn" href="/create-task/">+ Create Task</a>
+</div>
 
-<a href="/create-task/">Create New Task</a>
-<br><br>
+</div>
 
-<table border="1">
-    <tr>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Priority</th>
-        <th>Deadline</th>
-    </tr>
+<!-- Stats -->
 
-    {% for task in tasks %}
-    <tr>
-        <td>{{ task.title }}</td>
-        <td>{{ task.status }}</td>
-        <td>{{ task.priority }}</td>
-        <td>{{ task.deadline }}</td>
-        <a href="/edit-task/{{ task.id }}/">Edit</a><br>
-        <br>
-        <a href="/delete-task/{{ task.id }}/" onclick="return confirm('Are you sure you want to delete this task?');">
-        Delete
-        </a>
-    </td>
-    </tr>
-    {% endfor %}
+<div class="stats">
+
+<div class="card">
+<div class="card-title">Total Tasks</div>
+<div class="card-value">{{ tasks|length }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">Completed</div>
+<div class="card-value">{{ completed }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">Pending</div>
+<div class="card-value">{{ pending }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">High Priority</div>
+<div class="card-value">{{ high_priority }}</div>
+</div>
+
+</div>
+
+<!-- Table -->
+
+<div class="table-container">
+
+{% if tasks %}
+
+<table>
+
+<tr>
+<th>Title</th>
+<th>Status</th>
+<th>Priority</th>
+<th>Deadline</th>
+<th class="actions">Actions</th>
+</tr>
+
+{% for task in tasks %}
+{% load tz %}
+<tr
+{% if task.deadline and task.deadline < now|date:"Y-m-d" and task.status != "completed" %}
+style="background:#fee2e2;"
+{% endif %}
+>
+
+<td>
+<a href="/task/{{ task.id }}/" style="text-decoration:none; color:#1f2937;">
+{{ task.title }}
+</a>
+</td>
+
+<td>
+
+<a href="/toggle-task/{{ task.id }}/" style="text-decoration:none;">
+
+{% if task.status == "completed" %}
+
+<span class="badge status-completed" style="cursor:pointer;">
+completed ✓
+</span>
+
+{% else %}
+
+<span class="badge status-pending" style="cursor:pointer;">
+pending ✓
+</span>
+
+{% endif %}
+
+</a>
+
+</td>
+
+<td>
+<span class="badge priority-{{ task.priority }}">
+{{ task.priority }}
+</span>
+</td>
+
+<td>{{ task.deadline }}</td>
+
+<td class="actions">
+
+<a class="action-btn edit" href="/edit-task/{{ task.id }}/">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+<path d="M12.854.146a.5.5 0 0 1 .707 0l2.293 2.293a.5.5 0 0 1 0 .707L5.207 13.793 2 14l.207-3.207L12.854.146z"/>
+</svg>
+
+</a>
+
+<a class="action-btn delete"
+href="/delete-task/{{ task.id }}/"
+onclick="return confirm('Delete this task?');">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm4 0A.5.5 0 0 1 10 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5z"/>
+<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h2.5a1 1 0 0 1 1 1zM6 1v1h4V1H6z"/>
+</svg>
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
 
 </table>
 
-<br>
+{% else %}
 
-<a href="/">Home</a>
+<div class="empty">
+You don't have any tasks yet.<br><br>
+<a class="button create-btn" href="/create-task/">Create your first task</a>
+</div>
 
-</body>
-</html>
+{% endif %}
+
+</div>
+
+</div>
+
+{% endblock %}

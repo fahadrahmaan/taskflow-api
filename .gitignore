@@ -1,6 +1,29 @@
-venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Django
 db.sqlite3
-staticfiles/
+*.log
+
+# Environment variables
 .env
+
+# VS Code
+.vscode/
+
+# macOS / system
+.DS_Store
+
+# PyCharm
+.idea/
+
+# Docker / local cache
+*.sqlite3

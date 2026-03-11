@@ -9,6 +9,7 @@ from .views import create_task
 from .views import edit_task
 from .views import delete_task
 from .views import logout_user
+from . import views
 
 router = DefaultRouter()
 router.register(r'tasks', TaskViewSet, basename='task')
@@ -24,4 +25,8 @@ urlpatterns = [
     path('edit-task/<int:task_id>/', edit_task, name='edit_task'),
     path('delete-task/<int:task_id>/', delete_task, name='delete_task'),
     path('logout/', logout_user, name='logout'),
+    path("task/<int:task_id>/", views.task_detail, name="task_detail"),
+    path("toggle-task/<int:task_id>/", views.toggle_task_status, name="toggle_task_status"),
+    path("admin-insights/", views.admin_insights, name="admin_insights"),
+    path("delete-user/<int:user_id>/", views.delete_user, name="delete_user"),
 ]

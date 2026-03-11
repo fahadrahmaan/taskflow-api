@@ -1,0 +1,94 @@
+{% extends "tasks/base.html" %}
+
+{% block content %}
+
+<div class="main">
+
+    <div class="topbar">
+
+        <h1>Admin Insights</h1>
+
+        <div>
+            <a class="button create-btn" href="/dashboard/">Back to Dashboard</a>
+        </div>
+
+    </div>
+
+    <!-- Stats -->
+
+    <div class="stats">
+
+        <div class="card">
+            <div class="card-title">Total Users</div>
+            <div class="card-value">{{ total_users }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Total Tasks</div>
+            <div class="card-value">{{ total_tasks }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Completed Tasks</div>
+            <div class="card-value">{{ completed_tasks }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Pending Tasks</div>
+            <div class="card-value">{{ pending_tasks }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">High Priority</div>
+            <div class="card-value">{{ high_priority_tasks }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Overdue Tasks</div>
+            <div class="card-value">{{ overdue_tasks }}</div>
+        </div>
+
+    </div>
+
+    <!-- Users Table -->
+
+    <div class="table-container">
+
+        <table>
+
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th class="actions">Actions</th>
+            </tr>
+
+            {% for user_item in users %}
+            <tr>
+
+                <td>{{ user_item.id }}</td>
+                <td>{{ user_item.username }}</td>
+
+                <td class="actions">
+                    <a class="action-btn delete"
+                       href="/delete-user/{{ user_item.id }}/"
+                       onclick="return confirm('Are you sure you want to delete this user? This will also delete all their tasks.');">
+                        Delete
+                    </a>
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align:center; padding:20px; color:#6b7280;">
+                    No users available.
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
